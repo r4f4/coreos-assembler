@@ -249,7 +249,13 @@ EOF
 if [ -x /usr/libexec/qemu-kvm ]; then
     QEMU_KVM="/usr/libexec/qemu-kvm"
 else
-    QEMU_KVM="qemu-system-$(arch) -accel kvm"
+    # Enable arch-specific options for qemu
+    case "$(arch)"
+        "x86_64")  QEMU_KVM="qemu-system-$(arch) -accel kvm"              ;;
+        "aarch64") QEMU_KVM="qemu-system-$(arch) -M virt -cpu cortex-a57" ;;
+        "ppc64le") QEMU_KVM="qemu-system-ppc64 -accel kvm"                ;;
+        *)         fatal "Architecture $(arch) not supported"
+    esac
 fi
 
 runvm() {
@@ -292,18 +298,26 @@ EOF
         srcvirtfs=("-virtfs" "local,id=source,path=${workdir}/src/config,security_model=none,mount_tag=source")
     fi
 
+    # Default values
+    serialdev=ttyS0
+    pcibus=pci.0
+    if [ "$(arch)" = "aarch64" ]; then
+        pcibus=pcie.0
+        serialdev=ttyAMA0
+    fi
+
     ${QEMU_KVM} -nodefaults -nographic -m 2048 -no-reboot \
         -kernel "${vmbuilddir}/kernel" \
         -initrd "${vmbuilddir}/initrd" \
         -netdev user,id=eth0,hostname=supermin \
         -device virtio-net-pci,netdev=eth0 \
-        -device virtio-scsi-pci,id=scsi0,bus=pci.0,addr=0x3 \
+        -device virtio-scsi-pci,id=scsi0,bus=${pcibus},addr=0x3 \
         -drive if=none,id=drive-scsi0-0-0-0,snapshot=on,file="${vmbuilddir}/root" \
         -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1 \
         -drive if=none,id=drive-scsi0-0-0-1,discard=unmap,file="${workdir}/cache/cache.qcow2" \
         -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=1,drive=drive-scsi0-0-0-1,id=scsi0-0-0-1 \
         -virtfs local,id=workdir,path="${workdir}",security_model=none,mount_tag=workdir \
-        "${srcvirtfs[@]}" -serial stdio -append "root=/dev/sda console=ttyS0 selinux=1 enforcing=0 autorelabel=1"
+        "${srcvirtfs[@]}" -serial stdio -append "root=/dev/sda console=${serialdev} selinux=1 enforcing=0 autorelabel=1"
 
     if [ ! -f "${workdir}"/tmp/rc ]; then
         fatal "Couldn't find rc file, something went terribly wrong!"
