@@ -31,15 +31,15 @@ tmp_dest=${tmpd}/box.img
 # performance monitoring for nested virtualization doesn't work reliably on
 # different hypervisors (VMWare, VirtualBox, etc) so just disable the pmu
 qemu_wrapper=${tmpd}/qemu-wrapper.sh
-cat <<EOF > "${qemu_wrapper}"
+cat <<'EOF' > "${qemu_wrapper}"
 #!/usr/bin/bash -
 i=0
-while [ \$# -gt 0 ]; do
-    case "\$1" in
+while [ $# -gt 0 ]; do
+    case "$1" in
     -cpu)
         shift 2;;
     *)
-        args[i]="\$1"
+        args[i]="$1"
         (( i++ ))
         shift ;;
     esac
@@ -50,6 +50,8 @@ EOF
 # Only x86_64 supports pmu=off option
 if [ "$(arch)" == "x86_64" ]; then
     echo "exec ${QEMU_KVM} "'-cpu host,pmu=off "${args[@]}"' >> "${qemu_wrapper}"
+elif [ "$(arch)" == "ppc64le" ]; then
+    echo "exec ${QEMU_KVM} "'-cpu host "${args[@]}"' >> "${qemu_wrapper}"
 else
     echo "exec ${QEMU_KVM} "'"${args[@]}"' >> "${qemu_wrapper}"
 fi
