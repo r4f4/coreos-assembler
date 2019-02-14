@@ -250,10 +250,10 @@ if [ -x /usr/libexec/qemu-kvm ]; then
     QEMU_KVM="/usr/libexec/qemu-kvm"
 else
     # Enable arch-specific options for qemu
-    case "$(arch)"
-        "x86_64")  QEMU_KVM="qemu-system-$(arch) -accel kvm"              ;;
-        "aarch64") QEMU_KVM="qemu-system-$(arch) -M virt -cpu cortex-a57" ;;
-        "ppc64le") QEMU_KVM="qemu-system-ppc64 -accel kvm"                ;;
+    case "$(arch)" in
+        "x86_64")  QEMU_KVM="qemu-system-$(arch) -accel kvm"        ;;
+        "aarch64") QEMU_KVM="qemu-system-$(arch) -accel kvm -M virt" ;;
+        "ppc64le") QEMU_KVM="qemu-system-ppc64 -accel kvm"          ;;
         *)         fatal "Architecture $(arch) not supported"
     esac
 fi
