@@ -15,7 +15,7 @@ rpm-ostree createrepo_c openssh-clients
 
 # For generating ISO images
 genisoimage
-#FEDORA syslinux-nonlinux
+##FEDORA syslinux-nonlinux
 #EL7 syslinux
 
 # We expect people to use these explicitly in their repo configurations.
