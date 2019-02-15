@@ -251,9 +251,9 @@ if [ -x /usr/libexec/qemu-kvm ]; then
 else
     # Enable arch-specific options for qemu
     case "$(arch)" in
-        "x86_64")  QEMU_KVM="qemu-system-$(arch) -accel kvm"        ;;
+        "x86_64")  QEMU_KVM="qemu-system-$(arch) -accel kvm"         ;;
         "aarch64") QEMU_KVM="qemu-system-$(arch) -accel kvm -M virt" ;;
-        "ppc64le") QEMU_KVM="qemu-system-ppc64 -accel kvm"          ;;
+        "ppc64le") QEMU_KVM="qemu-system-ppc64 -accel kvm"           ;;
         *)         fatal "Architecture $(arch) not supported"
     esac
 fi
@@ -306,7 +306,7 @@ EOF
         serialdev=ttyAMA0
     fi
 
-    ${QEMU_KVM} -nodefaults -nographic -m 2048 -no-reboot \
+    ${QEMU_KVM} -nodefaults -nographic -m 2048 -no-reboot -cpu host \
         -kernel "${vmbuilddir}/kernel" \
         -initrd "${vmbuilddir}/initrd" \
         -netdev user,id=eth0,hostname=supermin \

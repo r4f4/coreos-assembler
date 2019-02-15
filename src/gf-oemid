@@ -76,7 +76,7 @@ coreos_gf_run_mount "${tmp_dest}"
 if [ "$(arch)" == "x86_64" ]; then
     grubcfg_path=/boot/loader/grub.cfg
 else
-    grubcfg_path=/boot/EFI/fedora/grub.cfg
+    grubcfg_path=/boot/efi/EFI/fedora/grub.cfg
 fi
 coreos_gf download "${grubcfg_path}" "${tmpd}"/grub.cfg
 # Remove any oemid currently there
