@@ -131,7 +131,7 @@ if [ -z "${IGNITION_CONFIG_FILE:-}" ]; then
     "systemd": {
         "units": [
             {
-                "name": "serial-getty@ttyS0.service",
+                "name": "serial-getty@ttyAMA0.service",
                 "dropins": [
                     {
                         "name": "autologin-core.conf",
