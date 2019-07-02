@@ -128,7 +128,7 @@ if [ ! -e "$PWD/tmp/ostree-size.json" ]; then
 fi
 size="$(jq '."estimate-mb".final' "$PWD/tmp/ostree-size.json")"
 # 384M is the non-ostree partitions
-size="$(( size + 384 ))M"
+size="$(( size + 512 ))M"
 echo "Disk size estimated to $size"
 kargs="$(python3 -c 'import sys, yaml; args = yaml.load(sys.stdin)["extra-kargs"]; print(" ".join(args))' < "$configdir/image.yaml")"
 kargs="$kargs console=tty0 console=${VM_TERMINAL},115200n8 ignition.platform.id=metal"
